@@ -24,39 +24,51 @@ const IMAGES = [
   '/images/shot-3-bowl.webp',
 ] as const;
 
+// Transition timing knobs (ms). Tweak here to retune the feel.
+const OPEN_MS = 850; // Shot 1 → Shot 2
+const FLUSH_MS = 750; // Shot 2 → Shot 3
+const FLASH_PEAK = 0.6; // 0..1 black flash midway through transitions
+
 export default function Scene() {
   const [state, setState] = useState<SceneState>('shot1');
   const [answer, setAnswer] = useState<string>('');
   const [muted, setMuted] = useState(false);
   const [resetting, setResetting] = useState(false);
+  const [flash, setFlash] = useState(0);
   const audio = useAudio();
   const reducedMotion = useReducedMotion();
 
   usePreloadImages(IMAGES);
 
-  // Start ambient loop once user has interacted (autoplay unlock).
+  // Start ambient loop after first interaction.
   useEffect(() => {
-    if (state !== 'shot1' && state !== 'answered') {
-      audio.playLoop('ambient', 0.15);
+    if (state !== 'shot1') {
+      audio.playLoop('ambient', 0.18);
     }
   }, [state, audio]);
+
+  const triggerFlash = useCallback((duration: number) => {
+    setFlash(FLASH_PEAK);
+    window.setTimeout(() => setFlash(0), duration);
+  }, []);
 
   const handleDoorClick = useCallback(() => {
     if (state !== 'shot1') return;
     audio.unlock();
     audio.play('doorClang', 0.7);
-    audio.playLoop('ambient', 0.15);
+    audio.playLoop('ambient', 0.18);
     if (reducedMotion) {
       setState('shot2');
       return;
     }
     setState('opening');
-    window.setTimeout(() => setState('shot2'), 600);
-  }, [state, audio, reducedMotion]);
+    triggerFlash(220);
+    window.setTimeout(() => setState('shot2'), OPEN_MS);
+  }, [state, audio, reducedMotion, triggerFlash]);
 
   const handleFlushClick = useCallback(() => {
     if (state !== 'shot2') return;
-    audio.play('flush', 0.8);
+    audio.play('flush', 0.85);
     if (reducedMotion) {
       const picked = getRandomAnswer();
       setAnswer(picked);
@@ -65,8 +77,9 @@ export default function Scene() {
       return;
     }
     setState('flushing');
-    window.setTimeout(() => setState('swirling'), 500);
-  }, [state, audio, reducedMotion]);
+    triggerFlash(180);
+    window.setTimeout(() => setState('swirling'), FLUSH_MS);
+  }, [state, audio, reducedMotion, triggerFlash]);
 
   const handleSwirlComplete = useCallback(() => {
     const picked = getRandomAnswer();
@@ -88,7 +101,7 @@ export default function Scene() {
       setAnswer('');
       setState('shot1');
       window.setTimeout(() => setResetting(false), 400);
-    }, 200);
+    }, 220);
   }, [state, reducedMotion]);
 
   const handleMute = useCallback(() => {
@@ -129,24 +142,27 @@ export default function Scene() {
             />
           )}
         </AnimatePresence>
+
+        <div className="film-grain" aria-hidden />
+        <div className="flicker" aria-hidden />
       </div>
+
+      {/* Black-flash overlay used to mask hard cuts during transitions */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 z-40 bg-black transition-opacity duration-150 ease-out"
+        style={{ opacity: resetting ? 1 : flash }}
+      />
 
       <button
         type="button"
         onClick={handleMute}
         aria-label={muted ? 'Unmute audio' : 'Mute audio'}
         aria-pressed={muted}
-        className="absolute right-3 top-3 z-50 rounded-full bg-black/40 p-2 text-white/80 backdrop-blur transition hover:bg-black/60 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+        className="absolute right-3 top-3 z-50 rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition hover:bg-black/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
       >
         {muted ? <MutedIcon /> : <SoundIcon />}
       </button>
-
-      {resetting && (
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0 z-40 bg-black opacity-100 transition-opacity duration-300"
-        />
-      )}
     </main>
   );
 }

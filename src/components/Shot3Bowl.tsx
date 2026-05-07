@@ -24,18 +24,25 @@ export default function Shot3Bowl({
 
   return (
     <motion.div
-      initial={{ opacity: 1, scale: 1.05 }}
+      initial={{ opacity: 0, scale: 1.22, filter: 'blur(10px) brightness(0.7)' }}
       animate={{
         opacity: 1,
-        scale: 1,
-        x: swirling ? [0, -2, 2, -1, 1, 0] : 0,
+        scale: swirling ? [1.02, 0.99, 1.01, 1.0] : [1.0, 1.015, 1.0],
+        x: swirling ? [0, -4, 4, -2, 2, 0] : [0, -2, 2, 0],
+        y: swirling ? [0, 2, -1, 0] : [0, -1, 1, 0],
+        filter: 'blur(0px) brightness(1)',
       }}
       exit={{ opacity: 0 }}
       transition={{
-        scale: { duration: 0.25, ease: 'easeOut' },
+        opacity: { duration: 0.55 },
+        scale: swirling
+          ? { duration: 1.4, repeat: Infinity, ease: 'easeInOut' }
+          : { duration: 8, repeat: Infinity, ease: 'easeInOut' },
         x: swirling
-          ? { duration: 0.3, repeat: 4, ease: 'easeInOut' }
-          : { duration: 0 },
+          ? { duration: 0.4, repeat: 5, ease: 'easeInOut' }
+          : { duration: 10, repeat: Infinity, ease: 'easeInOut' },
+        y: { duration: 12, repeat: Infinity, ease: 'easeInOut' },
+        filter: { duration: 0.7 },
       }}
       className="absolute inset-0"
     >
@@ -44,11 +51,12 @@ export default function Shot3Bowl({
         alt="Top-down view of a toilet bowl with calm water."
         fill
         sizes="100vw"
-        className="object-contain"
+        className="object-cover"
+        style={{ objectPosition: 'center' }}
       />
       <div
-        className="pointer-events-none absolute left-1/2 top-[48%] -translate-x-1/2 -translate-y-1/2"
-        style={{ width: 'min(40vw, 40vh)', height: 'min(40vw, 40vh)' }}
+        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+        style={{ width: 'min(48vw, 48vh)', height: 'min(48vw, 48vh)' }}
       >
         {swirling && <WaterSwirl onComplete={onSwirlComplete} />}
       </div>
