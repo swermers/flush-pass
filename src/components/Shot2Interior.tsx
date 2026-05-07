@@ -9,6 +9,14 @@ interface Props {
   flushing: boolean;
 }
 
+// Flush-handle position in source-image coordinates (% of the 1:1 webp).
+// The image is rendered with object-cover + objectPosition 'center 55%';
+// the wrapper layer below mirrors that exact rect so these percentages
+// land on the right pixel at any viewport ratio.
+const HANDLE_X = 39;
+const HANDLE_Y = 58;
+const OBJECT_Y = 55; // must match the image's objectPosition Y
+
 export default function Shot2Interior({ onFlush, flushing }: Props) {
   const [showHint, setShowHint] = useState(false);
 
@@ -61,30 +69,48 @@ export default function Shot2Interior({ onFlush, flushing }: Props) {
         fill
         sizes="100vw"
         className="object-cover"
-        style={{ objectPosition: 'center 55%' }}
+        style={{ objectPosition: `center ${OBJECT_Y}%` }}
       />
-      <button
-        type="button"
-        onClick={onFlush}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' || e.key === ' ') {
-            e.preventDefault();
-            onFlush();
-          }
+
+      {/* Wrapper that mirrors the image's rendered 1:1 rect. Children
+          positioned with % coordinates land on the source image pixels. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute"
+        style={{
+          width: 'max(100vw, 100dvh)',
+          height: 'max(100vw, 100dvh)',
+          left: '50%',
+          top: `${OBJECT_Y}%`,
+          transform: `translate(-50%, -${OBJECT_Y}%)`,
         }}
-        aria-label="Flush the toilet"
-        className="absolute inset-0 cursor-pointer bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
       >
-        {showHint && !flushing && (
-          <motion.span
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.9 }}
-            className="flush-hint pointer-events-none absolute left-1/2 top-[68%] z-10 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/0"
-          />
-        )}
-        <span className="sr-only">Flush</span>
-      </button>
+        <button
+          type="button"
+          onClick={onFlush}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onFlush();
+            }
+          }}
+          aria-label="Flush the toilet"
+          disabled={flushing}
+          className="group pointer-events-auto absolute cursor-pointer rounded-full bg-transparent focus:outline-none focus-visible:ring-2 focus-visible:ring-white/80"
+          style={{
+            left: `${HANDLE_X}%`,
+            top: `${HANDLE_Y}%`,
+            width: 'clamp(48px, 5vmax, 96px)',
+            height: 'clamp(48px, 5vmax, 96px)',
+            transform: 'translate(-50%, -50%)',
+          }}
+        >
+          {showHint && !flushing && (
+            <span className="flush-hint pointer-events-none absolute inset-0 rounded-full" />
+          )}
+          <span className="sr-only">Flush</span>
+        </button>
+      </div>
     </motion.div>
   );
 }
