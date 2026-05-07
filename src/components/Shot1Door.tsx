@@ -13,25 +13,45 @@ export default function Shot1Door({ onActivate, opening }: Props) {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
-    const t = window.setTimeout(() => setShowHint(true), 2000);
+    const t = window.setTimeout(() => setShowHint(true), 1800);
     return () => window.clearTimeout(t);
   }, []);
 
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{
-        opacity: opening ? 0 : 1,
-        scale: opening ? 1.15 : 1,
-        filter: opening ? 'blur(2px)' : 'blur(0px)',
-      }}
+      initial={{ opacity: 0, scale: 1.06 }}
+      animate={
+        opening
+          ? {
+              opacity: 0,
+              scale: 1.5,
+              filter: 'blur(14px) brightness(1.15)',
+            }
+          : {
+              opacity: 1,
+              scale: [1.0, 1.025, 1.0],
+              x: [0, -3, 2, 0],
+              y: [0, 2, -1, 0],
+              filter: 'blur(0px) brightness(1)',
+            }
+      }
       exit={{ opacity: 0 }}
-      transition={{
-        opacity: { duration: opening ? 0.25 : 0.4, delay: opening ? 0.15 : 0 },
-        scale: { duration: 0.4, ease: 'easeOut' },
-        filter: { duration: 0.4 },
-      }}
-      className="absolute inset-0 flex items-center justify-center"
+      transition={
+        opening
+          ? {
+              opacity: { duration: 0.5, delay: 0.25 },
+              scale: { duration: 0.85, ease: [0.6, 0.05, 0.95, 0.5] },
+              filter: { duration: 0.85 },
+            }
+          : {
+              opacity: { duration: 0.6 },
+              scale: { duration: 9, repeat: Infinity, ease: 'easeInOut' },
+              x: { duration: 11, repeat: Infinity, ease: 'easeInOut' },
+              y: { duration: 13, repeat: Infinity, ease: 'easeInOut' },
+              filter: { duration: 0.6 },
+            }
+      }
+      className="absolute inset-0"
     >
       <button
         type="button"
@@ -51,14 +71,15 @@ export default function Shot1Door({ onActivate, opening }: Props) {
           fill
           priority
           sizes="100vw"
-          className="object-contain"
+          className="object-cover"
+          style={{ objectPosition: 'center' }}
         />
         {showHint && !opening && (
           <motion.span
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.7 }}
-            transition={{ duration: 0.8 }}
-            className="pointer-events-none absolute bottom-8 font-marker text-lg tracking-wide text-white/80 drop-shadow-lg sm:text-2xl"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 0.75, y: 0 }}
+            transition={{ duration: 1.0 }}
+            className="pointer-events-none absolute bottom-12 z-10 font-marker text-lg tracking-[0.2em] text-white/85 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] sm:text-2xl"
           >
             click to enter
           </motion.span>
