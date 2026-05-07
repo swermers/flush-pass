@@ -5,10 +5,10 @@ import { useCallback, useEffect, useRef } from 'react';
 export type AudioName = 'doorClang' | 'flush' | 'ambient' | 'reveal';
 
 const SOURCES: Record<AudioName, string> = {
-  doorClang: '/audio/door-clang.mp3',
-  flush: '/audio/flush.mp3',
-  ambient: '/audio/ambient.mp3',
-  reveal: '/audio/reveal.mp3',
+  doorClang: '/audio/door-clang.wav',
+  flush: '/audio/flush.wav',
+  ambient: '/audio/ambient.wav',
+  reveal: '/audio/reveal.wav',
 };
 
 export interface AudioApi {
