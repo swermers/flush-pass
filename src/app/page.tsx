@@ -1,5 +1,5 @@
-import Scene from '@/components/Scene';
+import Landing from '@/components/Landing';
 
 export default function Page() {
-  return <Scene />;
+  return <Landing />;
 }

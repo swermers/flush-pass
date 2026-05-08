@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Permanent_Marker } from 'next/font/google';
+import PassFrame from '@/components/PassFrame';
 import './globals.css';
 
 const marker = Permanent_Marker({
@@ -39,7 +40,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={marker.variable}>
-      <body className="bg-black text-white antialiased">{children}</body>
+      <body className="bg-black text-white antialiased">
+        <PassFrame>{children}</PassFrame>
+      </body>
     </html>
   );
 }
