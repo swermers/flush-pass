@@ -1,10 +1,18 @@
-// 80 oracle answers in Gen Z dialect. Each leads with a clear verdict
-// (yes / granted / approved / cleared / bet  —  no / denied / hard no /
-// negative / permission revoked) so the ruling is unambiguous; the
-// slang lives in the riff after the colon. Roughly 50/50 split.
+// 150 oracle answers across themed packs. Every answer leads with a
+// clear verdict (yes / granted / approved / cleared / bet / signs
+// point to yes / verily / affirmative — vs no / denied / hard no /
+// negative / permission revoked / nay) so the ruling is unambiguous;
+// the riff carries the flavor.
+//
+// getRandomAnswer() day-weights the pool: weekday-energy answers only
+// roll Mon-Thu, Friday-energy answers only roll on Friday. Core pack
+// is always eligible.
 
-export const ANSWERS: readonly string[] = [
-  // ----- Yes (40) -----
+// =============================================================
+// CORE — always eligible (120)
+// =============================================================
+const CORE: readonly string[] = [
+  // ----- Gen Z, yes (40) -----
   'Yes. You ate this prompt.',
   'Bet. Go off, bestie.',
   'Yes. The bowl said periodt.',
@@ -46,7 +54,7 @@ export const ANSWERS: readonly string[] = [
   "Yes. You're so for real.",
   'Granted. Locked in. Cleared.',
 
-  // ----- No (40) -----
+  // ----- Gen Z, no (40) -----
   "No. That's giving NPC behavior.",
   'Hard no. -500 aura points.',
   'Denied. The flush is so over you.',
@@ -87,8 +95,128 @@ export const ANSWERS: readonly string[] = [
   'Denied. -2000 aura. Sit.',
   "No. That's so npc-coded.",
   'Negative. The toilet has standards.',
-] as const;
+
+  // ----- Variation packs (20: 4 each × 5) -----
+
+  // Shakespearean
+  'Forsooth, the bowl doth grant thee passage. Yes.',
+  'Nay. The porcelain hath denied thee.',
+  'Yea, verily — go thee and pee.',
+  'Hark! The flush sayeth no.',
+
+  // Corporate / HR speak
+  'Per our records: approved. Yes.',
+  'We regret to inform you: no.',
+  'Circling back — the bowl has cleared this. Yes.',
+  'Looping in the toilet. Verdict: hard no.',
+
+  // Movie trailer voice
+  'In a world... where one student dared to ask... the answer is yes.',
+  'One bell. One pass. One verdict: no.',
+  'From the makers of patience: permission granted.',
+  'Coming this hallway: hard no.',
+
+  // Magic 8-ball classic / prophetic
+  'Signs point to yes.',
+  'The omens are dark. Denied.',
+  'The stars say go. Yes.',
+  'It is foretold. Hard no.',
+
+  // Texting chaos / lowercase
+  'yea go go go',
+  'lol no',
+  'omg yes',
+  'no lmao sit down',
+
+  // ----- Teacher's Edition (20: eye-rolly slang awareness) -----
+
+  // yes (10)
+  "Yes. (I had to look up 'rizz' for this.) Go.",
+  "Granted. I am aware that 'bet' means yes now.",
+  'Approved. I will allow the sigma walk just this once.',
+  'Yes. Touch grass — that one I do understand.',
+  'Granted. Flush quietly please.',
+  'Yes. The bell is the real authority and it likes you.',
+  'Approved. Use complete sentences in the hallway.',
+  'Yes. Try to come back before the next slang cycle.',
+  "Granted. I marked this in my gradebook as 'go.'",
+  "Yes. (Yes, I know what 'mid' means. I have been told.)",
+
+  // no (10)
+  "No. Stop saying 'cooked.'",
+  "Hard no. And it is pronounced 'periodt' apparently.",
+  "Denied. You did not, in fact, 'ate.'",
+  "No. Save the 'crashout' for the bell.",
+  'Hard no. Brain rot tax: five minutes of silence.',
+  "Denied. We are not doing 'bestie' in here.",
+  'Permission revoked. The grading rubric agrees.',
+  'No. Re-read the question. Also, sit.',
+  "Hard no. I do not accept 'bet' as an academic argument.",
+  'Denied. I have a meeting and you have a chair.',
+];
+
+// =============================================================
+// WEEKDAY ENERGY — only rolls Mon–Thu (15)
+// Bias: leans no. The week has not earned much.
+// =============================================================
+const WEEKDAY_ENERGY: readonly string[] = [
+  // yes (5)
+  'Yes. Monday survival bonus.',
+  'Granted. Thursday gets a pity yes.',
+  'Yes. Wednesday is a Wednesday. Fine.',
+  'Approved. Tuesday earned this one.',
+  'Yes. The week is hard. Be free.',
+
+  // no (10)
+  "No. It's Tuesday. Sit.",
+  'Hard no. Wednesday math.',
+  'Denied. The week has not earned a pass yet.',
+  'No. Tuesday says no.',
+  'Hard no. We are fourteen percent into the week.',
+  'Denied. The week is still loading.',
+  'No. Monday energy. Grind mode.',
+  "Negative. It's not even noon.",
+  'Hard no. Three more days exist.',
+  'Denied. The hump has not humped.',
+];
+
+// =============================================================
+// FRIDAY ENERGY — only rolls on Friday (15)
+// Bias: leans yes. End-of-week amnesty.
+// =============================================================
+const FRIDAY_ENERGY: readonly string[] = [
+  // yes (12)
+  "YES. It's Friday. Go forth.",
+  'Approved. Pre-break amnesty granted.',
+  'Yes. Last bell energy.',
+  'Granted. The school is dissociating, so are you.',
+  'Yes. Even the principal is checked out.',
+  'Bet. Friday after lunch is a free-for-all.',
+  'Approved. Take your time. The year is over emotionally.',
+  'Yes. The hallway is yours, bestie.',
+  'Granted. End-of-week absolution.',
+  'Yes. We have all stopped pretending.',
+  'Approved. May your snack run be blessed.',
+  'Yes. Friday energy override engaged.',
+
+  // no (3)
+  'Hard no. Even Friday has rules.',
+  'Denied. Friday before a long weekend, my brain says no.',
+  'No. Substitute teacher logic: no.',
+];
+
+// Full export — handy for tests, counts, or manual browsing.
+export const ANSWERS: readonly string[] = [
+  ...CORE,
+  ...WEEKDAY_ENERGY,
+  ...FRIDAY_ENERGY,
+];
 
 export function getRandomAnswer(): string {
-  return ANSWERS[Math.floor(Math.random() * ANSWERS.length)];
+  // 0 = Sun, 1 = Mon, ..., 5 = Fri, 6 = Sat (user's local time)
+  const day = new Date().getDay();
+  const pool: string[] = [...CORE];
+  if (day >= 1 && day <= 4) pool.push(...WEEKDAY_ENERGY);
+  if (day === 5) pool.push(...FRIDAY_ENERGY);
+  return pool[Math.floor(Math.random() * pool.length)];
 }
