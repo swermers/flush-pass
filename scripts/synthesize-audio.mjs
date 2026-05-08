@@ -264,12 +264,81 @@ function reveal() {
   return normalize(mix(scale(attack, 0.35), body), 0.85);
 }
 
+// ----- 5. paper-rustle (~1.0s loopable): toilet paper unraveling -----
+function paperRustle() {
+  const dur = 1.0;
+  const n = Math.floor(dur * SR);
+
+  // Band-passed noise for rustle texture
+  const rustle = bandpass(noise(n), 1200, 6500);
+
+  // Amplitude modulation around 25 Hz to suggest paper waving
+  const am = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    am[i] = 0.5 + 0.5 * Math.sin(2 * Math.PI * 25 * (i / SR));
+  }
+
+  // Slow speed wobble (paper feed irregularity)
+  const wobble = new Float32Array(n);
+  for (let i = 0; i < n; i++) {
+    wobble[i] = 0.7 + 0.3 * Math.sin(2 * Math.PI * 1.7 * (i / SR));
+  }
+
+  let out = multiply(multiply(rustle, am), wobble);
+
+  // Crossfade ends to loop seamlessly
+  const xfade = Math.floor(0.04 * SR);
+  for (let i = 0; i < xfade; i++) {
+    const a = i / xfade;
+    const j = n - xfade + i;
+    const blended = out[i] * a + out[j] * (1 - a);
+    out[i] = blended;
+    out[j] = blended;
+  }
+
+  return normalize(out, 0.7);
+}
+
+// ----- 6. paper-rip (~0.25s): short paper-tear/thwap -----
+function paperRip() {
+  const dur = 0.25;
+  const n = Math.floor(dur * SR);
+
+  // Sweep cutoff downward over the duration to simulate a tear
+  const x = noise(n);
+  const out = new Float32Array(n);
+  let prev = 0;
+  for (let i = 0; i < n; i++) {
+    const t = i / n;
+    const cutoff = 5000 - 4200 * t;
+    const dt = 1 / SR;
+    const rc = 1 / (2 * Math.PI * cutoff);
+    const a = dt / (rc + dt);
+    prev += a * (x[i] - prev);
+    out[i] = prev;
+  }
+
+  return normalize(multiply(out, expDecay(n, 0.06)), 0.85);
+}
+
+// ----- 7. click (~30ms): tactile button click -----
+function click() {
+  const dur = 0.04;
+  const n = Math.floor(dur * SR);
+  const noiseBurst = multiply(noise(n), expDecay(n, 0.004));
+  const tone = multiply(scale(sine(2200, n), 0.3), expDecay(n, 0.005));
+  return normalize(mix(noiseBurst, tone), 0.75);
+}
+
 // ----- Render -----
 const jobs = [
   ['door-clang.wav', doorClang()],
   ['flush.wav', flush()],
   ['ambient.wav', ambient()],
   ['reveal.wav', reveal()],
+  ['paper-rustle.wav', paperRustle()],
+  ['paper-rip.wav', paperRip()],
+  ['click.wav', click()],
 ];
 
 for (const [name, samples] of jobs) {

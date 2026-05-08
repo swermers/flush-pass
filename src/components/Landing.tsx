@@ -25,10 +25,10 @@ export default function Landing() {
           icon={<DropIcon />}
         />
         <PassTile
+          href="/unravel"
           title="TP Unravel"
           subtitle="Pull the paper. Stop on your fate."
           icon={<RollIcon />}
-          disabled
         />
         <PassTile
           title="Dice Roll"

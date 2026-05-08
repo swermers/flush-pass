@@ -2,13 +2,23 @@
 
 import { useCallback, useEffect, useRef } from 'react';
 
-export type AudioName = 'doorClang' | 'flush' | 'ambient' | 'reveal';
+export type AudioName =
+  | 'doorClang'
+  | 'flush'
+  | 'ambient'
+  | 'reveal'
+  | 'paperRustle'
+  | 'paperRip'
+  | 'click';
 
 const SOURCES: Record<AudioName, string> = {
   doorClang: '/audio/door-clang.wav',
   flush: '/audio/flush.wav',
   ambient: '/audio/ambient.wav',
   reveal: '/audio/reveal.wav',
+  paperRustle: '/audio/paper-rustle.wav',
+  paperRip: '/audio/paper-rip.wav',
+  click: '/audio/click.wav',
 };
 
 export interface AudioApi {
