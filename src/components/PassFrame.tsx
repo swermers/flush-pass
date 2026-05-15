@@ -1,6 +1,8 @@
 'use client';
 
 import { useReducedMotion } from 'framer-motion';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   createContext,
   useCallback,
@@ -29,12 +31,20 @@ export function usePassFrame(): PassFrameApi {
   return ctx;
 }
 
+const OTHER_ROUTE: Record<string, string> = {
+  '/oracle': '/unravel',
+  '/unravel': '/oracle',
+};
+
 export default function PassFrame({ children }: { children: ReactNode }) {
   const audio = useAudio();
   const reducedMotion = useReducedMotion() ?? false;
   const [muted, setMuted] = useState(false);
   const ambientStarted = useRef(false);
   const [ambientActive, setAmbientActive] = useState(false);
+  const pathname = usePathname();
+  const otherRoute = pathname ? OTHER_ROUTE[pathname] : undefined;
+  const showNav = otherRoute !== undefined;
 
   const startAmbient = useCallback(() => {
     if (ambientStarted.current) return;
@@ -71,6 +81,25 @@ export default function PassFrame({ children }: { children: ReactNode }) {
           <div className="flicker" aria-hidden />
         </div>
 
+        {showNav && (
+          <div className="absolute left-3 top-3 z-50 flex gap-2">
+            <Link
+              href="/"
+              aria-label="Back to options"
+              className="rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition hover:bg-black/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              <BackIcon />
+            </Link>
+            <Link
+              href={otherRoute!}
+              aria-label="Try the other oracle"
+              className="rounded-full bg-black/50 p-2 text-white/80 backdrop-blur transition hover:bg-black/70 hover:text-white focus:outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              <SwapIcon />
+            </Link>
+          </div>
+        )}
+
         <button
           type="button"
           onClick={handleMute}
@@ -82,6 +111,43 @@ export default function PassFrame({ children }: { children: ReactNode }) {
         </button>
       </div>
     </PassFrameContext.Provider>
+  );
+}
+
+function BackIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden
+    >
+      <path d="M15 18l-6-6 6-6" />
+    </svg>
+  );
+}
+
+function SwapIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className="h-5 w-5"
+      aria-hidden
+    >
+      <path d="M7 7h13l-3-3" />
+      <path d="M17 17H4l3 3" />
+    </svg>
   );
 }
 
