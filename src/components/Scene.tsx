@@ -60,7 +60,7 @@ export default function Scene() {
     audio.play('flush', 0.85);
     if (reducedMotion) {
       const picked = getRandomAnswer();
-      setAnswer(picked);
+      setAnswer(picked.text);
       setState('answered');
       audio.play('reveal', 0.5);
       return;
@@ -72,7 +72,7 @@ export default function Scene() {
 
   const handleSwirlComplete = useCallback(() => {
     const picked = getRandomAnswer();
-    setAnswer(picked);
+    setAnswer(picked.text);
     setState('revealing');
     audio.play('reveal', 0.5);
     window.setTimeout(() => setState('answered'), 1200);

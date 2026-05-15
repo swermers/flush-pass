@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Permanent_Marker } from 'next/font/google';
+import { Bebas_Neue, Permanent_Marker, Special_Elite } from 'next/font/google';
 import PassFrame from '@/components/PassFrame';
 import './globals.css';
 
@@ -7,6 +7,20 @@ const marker = Permanent_Marker({
   weight: '400',
   subsets: ['latin'],
   variable: '--font-marker',
+  display: 'swap',
+});
+
+const stamp = Special_Elite({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-stamp',
+  display: 'swap',
+});
+
+const display = Bebas_Neue({
+  weight: '400',
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 });
 
@@ -39,7 +53,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={marker.variable}>
+    <html
+      lang="en"
+      className={`${marker.variable} ${stamp.variable} ${display.variable}`}
+    >
       <body className="bg-black text-white antialiased">
         <PassFrame>{children}</PassFrame>
       </body>
