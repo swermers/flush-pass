@@ -37,10 +37,10 @@ export default function Landing() {
           icon={<DoorIcon />}
         />
         <PassTile
+          href="/dice"
           title="Dice Roll"
           subtitle="Six faces. One is mercy."
           icon={<DiceIcon />}
-          disabled
         />
       </div>
 

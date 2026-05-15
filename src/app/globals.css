@@ -1296,6 +1296,523 @@ button.doors-chip:disabled {
   }
 }
 
+/* =================================================================
+   DICE ORACLE — 3D CSS cube on a felt-table backdrop. Stage is 1280x800
+   scaled to fit the viewport via inline style on .dice-stage-root.
+   ================================================================= */
+.dice-viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: radial-gradient(
+    ellipse 65% 55% at 50% 48%,
+    #5a6473 0%,
+    #444c58 55%,
+    #2f343c 100%
+  );
+}
+.dice-stage-root {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 1280px;
+  height: 800px;
+  transform-origin: 0 0;
+}
+
+.dice-header {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  pointer-events: none;
+}
+.dice-brand {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: 30px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.86);
+  text-transform: uppercase;
+}
+.dice-brand-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #ffd166;
+  box-shadow: 0 0 12px rgba(255, 209, 102, 0.5);
+}
+
+.dice-meta {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  display: flex;
+  gap: 10px;
+  z-index: 50;
+}
+.dice-top-right {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  display: flex;
+  gap: 10px;
+  z-index: 50;
+}
+.dice-mercy-star {
+  margin-left: 8px;
+  color: #f1d27f;
+}
+
+/* invisible click overlay so the whole stage taps to roll/stop */
+.dice-tap-area {
+  position: absolute;
+  inset: 0;
+  background: transparent;
+  border: 0;
+  z-index: 5;
+  cursor: pointer;
+  outline: none;
+}
+.dice-tap-area:disabled {
+  cursor: default;
+}
+
+/* stage centerpiece: floor + die */
+.dice-stage-inner {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  perspective: 1400px;
+  pointer-events: none;
+}
+.dice-floor {
+  position: absolute;
+  left: 50%;
+  top: 62%;
+  width: 720px;
+  height: 240px;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.32) 35%,
+    rgba(0, 0, 0, 0) 72%
+  );
+  filter: blur(2px);
+  pointer-events: none;
+  z-index: 1;
+}
+.dice-die-host {
+  transform-style: preserve-3d;
+  transition:
+    transform 600ms cubic-bezier(0.2, 0.7, 0.2, 1),
+    opacity 600ms ease;
+  filter: drop-shadow(0 24px 36px rgba(0, 0, 0, 0.55));
+  z-index: 2;
+}
+
+/* die: 3D cube ------------------------------------------------- */
+.die-wrap {
+  --die-size: 320px;
+  position: relative;
+  width: var(--die-size);
+  height: var(--die-size);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.die {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.die-face {
+  position: absolute;
+  inset: 0;
+  border-radius: 38px;
+  background: radial-gradient(
+    circle at 28% 22%,
+    #fdfaf1 0%,
+    #f6efde 38%,
+    #d9cfb4 100%
+  );
+  box-shadow:
+    inset 0 0 0 2px rgba(0, 0, 0, 0.05),
+    inset 0 8px 22px rgba(255, 255, 255, 0.55),
+    inset 0 -14px 32px rgba(50, 38, 18, 0.22),
+    inset 0 0 60px rgba(120, 95, 50, 0.1);
+  backface-visibility: hidden;
+}
+.die-face::before {
+  content: '';
+  position: absolute;
+  inset: 8px;
+  border-radius: 32px;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.04);
+  pointer-events: none;
+}
+
+.die-pips {
+  position: absolute;
+  inset: 14%;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  gap: 6%;
+}
+.pip-slot {
+  display: grid;
+  place-items: center;
+}
+.pip {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 32%,
+    #4a3e25 0%,
+    #18140d 55%,
+    #050300 100%
+  );
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.12),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.55),
+    0 1px 1px rgba(255, 255, 255, 0.6);
+}
+.pip.gold {
+  background: radial-gradient(
+    circle at 32% 28%,
+    #f1d27f 0%,
+    #c39a4b 55%,
+    #8a6a2a 100%
+  );
+  box-shadow:
+    inset 0 2px 3px rgba(255, 255, 255, 0.5),
+    inset 0 -2px 4px rgba(80, 50, 0, 0.65),
+    0 0 0 1px rgba(60, 40, 0, 0.3),
+    0 0 10px rgba(243, 200, 90, 0.55);
+}
+
+/* 6-face cube layout — half-size translations on a 320px die = 160px */
+.face-1 {
+  transform: translateZ(160px);
+}
+.face-6 {
+  transform: rotateY(180deg) translateZ(160px);
+}
+.face-3 {
+  transform: rotateY(90deg) translateZ(160px);
+}
+.face-4 {
+  transform: rotateY(-90deg) translateZ(160px);
+}
+.face-2 {
+  transform: rotateX(90deg) translateZ(160px);
+}
+.face-5 {
+  transform: rotateX(-90deg) translateZ(160px);
+}
+
+/* hint --------------------------------------------------------- */
+.dice-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 90px;
+  transform: translateX(-50%);
+  z-index: 14;
+  font-family: var(--font-marker), cursive;
+  letter-spacing: 0.25em;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 28px;
+  text-transform: lowercase;
+  text-shadow: 0 2px 12px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+  animation: hintBob 2.6s ease-in-out infinite;
+}
+
+/* wobble while decelerating */
+@keyframes diceWobble {
+  0%,
+  100% {
+    transform: translate(0, 0) rotate(0);
+  }
+  25% {
+    transform: translate(-2px, 1px) rotate(-0.2deg);
+  }
+  75% {
+    transform: translate(2px, -1px) rotate(0.2deg);
+  }
+}
+.dice-stage-root.wobble .dice-floor {
+  animation: diceWobble 120ms ease-in-out infinite;
+}
+
+/* confetti for mercy rolls */
+.dice-confetti {
+  position: absolute;
+  inset: 0;
+  z-index: 26;
+  pointer-events: none;
+  overflow: hidden;
+}
+.dice-confetti-bit {
+  width: 12px;
+  height: 18px;
+  border-radius: 2px;
+  position: absolute;
+  opacity: 0;
+  animation: diceFlutter 2200ms cubic-bezier(0.2, 0.5, 0.4, 1) forwards;
+}
+@keyframes diceFlutter {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) rotate(0deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx, 0), var(--dy, 600px))
+      rotate(var(--rot, 720deg));
+  }
+}
+
+/* hall-pass slip (dice variant — rises from below the die) ---- */
+.dice-slip-wrap {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 680px;
+  z-index: 30;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  perspective: 900px;
+  animation: diceSlipIn 650ms cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.dice-slip-wrap.is-open {
+  pointer-events: auto;
+}
+@keyframes diceSlipIn {
+  0% {
+    transform: translate(-50%, 60%) rotate(2deg) scale(0.92);
+    opacity: 0;
+  }
+  60% {
+    transform: translate(-50%, -54%) rotate(-2deg) scale(1.02);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) rotate(-1.2deg) scale(1);
+    opacity: 1;
+  }
+}
+
+.dice-slip {
+  position: relative;
+  padding: 40px 50px 32px;
+  background:
+    repeating-linear-gradient(
+      180deg,
+      transparent 0 56px,
+      rgba(40, 30, 10, 0.1) 56px 57px
+    ),
+    linear-gradient(180deg, #f6ecd2 0%, #e7d9b1 75%, #ccb98c 100%);
+  color: #2a200e;
+  border-radius: 4px;
+  box-shadow:
+    0 30px 60px rgba(0, 0, 0, 0.55),
+    0 10px 18px rgba(0, 0, 0, 0.35),
+    inset 0 0 0 2px rgba(60, 40, 10, 0.06);
+}
+.dice-slip::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -20px;
+  width: 180px;
+  height: 34px;
+  transform: translateX(-50%) rotate(-2.2deg);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 230, 140, 0.45) 0%,
+    rgba(255, 220, 100, 0.55) 50%,
+    rgba(255, 230, 140, 0.45) 100%
+  );
+  border-left: 1px dashed rgba(0, 0, 0, 0.1);
+  border-right: 1px dashed rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+.dice-slip::after {
+  content: '';
+  position: absolute;
+  left: 16px;
+  top: 100px;
+  bottom: 34px;
+  width: 12px;
+  background: radial-gradient(
+      circle at center,
+      rgba(0, 0, 0, 0.32) 0 5px,
+      transparent 6px
+    )
+    center/12px 56px repeat-y;
+  opacity: 0.7;
+}
+.dice-slip-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  border-bottom: 2px solid rgba(40, 30, 10, 0.55);
+  padding-bottom: 14px;
+  margin-bottom: 24px;
+}
+.dice-slip-eyebrow {
+  font-family: var(--font-stamp), monospace;
+  letter-spacing: 0.32em;
+  font-size: 13px;
+  text-transform: uppercase;
+  color: rgba(40, 30, 10, 0.65);
+}
+.dice-slip-title {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: 50px;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  color: #2a200e;
+}
+.dice-slip-roll {
+  font-family: var(--font-stamp), monospace;
+  font-size: 16px;
+  letter-spacing: 0.18em;
+  color: rgba(40, 30, 10, 0.6);
+}
+.dice-slip-roll b {
+  font-family: var(--font-display), Impact, sans-serif;
+  font-size: 26px;
+  letter-spacing: 0.06em;
+  color: #2a200e;
+  margin-left: 4px;
+}
+.dice-slip-verdict {
+  font-family: var(--font-marker), cursive;
+  font-size: 44px;
+  line-height: 1.1;
+  text-align: center;
+  color: #2a200e;
+  padding: 0 16px;
+  margin: 8px 0 22px;
+  text-wrap: balance;
+}
+.dice-slip-foot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22px;
+  padding-top: 14px;
+  border-top: 1px dashed rgba(40, 30, 10, 0.4);
+}
+.dice-slip-sigline {
+  flex: 1;
+  border-bottom: 1.5px solid #2a200e;
+  height: 30px;
+  position: relative;
+}
+.dice-slip-sigline span {
+  position: absolute;
+  bottom: -22px;
+  left: 0;
+  font-family: var(--font-stamp), monospace;
+  font-size: 12px;
+  letter-spacing: 0.22em;
+  color: rgba(40, 30, 10, 0.55);
+  text-transform: uppercase;
+}
+.dice-slip-sigline em {
+  position: absolute;
+  bottom: 4px;
+  left: 8px;
+  font-style: normal;
+  font-family: var(--font-marker), cursive;
+  font-size: 26px;
+  color: #8a2a1f;
+  transform: rotate(-3deg);
+}
+.dice-slip-stamp {
+  position: absolute;
+  top: 36px;
+  right: 32px;
+  width: 150px;
+  height: 150px;
+  border: 5px solid currentColor;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-stamp), monospace;
+  font-weight: 700;
+  font-size: 26px;
+  letter-spacing: 0.16em;
+  color: #8a2a1f;
+  text-align: center;
+  transform: rotate(-10deg);
+  mix-blend-mode: multiply;
+  opacity: 0.92;
+  line-height: 1;
+}
+.dice-slip-stamp::before {
+  content: '';
+  position: absolute;
+  inset: -10px;
+  border: 2px dashed currentColor;
+  border-radius: 50%;
+  opacity: 0.55;
+}
+.dice-slip-stamp small {
+  display: block;
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  margin-top: 6px;
+  opacity: 0.8;
+}
+.dice-slip-stamp.is-mercy {
+  color: #1c6b3c;
+  transform: rotate(-6deg);
+}
+.dice-slip-reset {
+  display: block;
+  margin: 22px auto 0;
+  background: transparent;
+  border: 0;
+  font-family: var(--font-marker), cursive;
+  font-size: 20px;
+  letter-spacing: 0.18em;
+  color: rgba(40, 30, 10, 0.7);
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 8px;
+  cursor: pointer;
+  padding: 6px 14px;
+  border-radius: 8px;
+  transition:
+    color 150ms ease,
+    background 150ms ease;
+}
+.dice-slip-reset:hover {
+  color: #2a200e;
+  background: rgba(40, 30, 10, 0.06);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dice-hint,
+  .dice-stage-root.wobble .dice-floor,
+  .dice-slip-wrap,
+  .dice-confetti-bit {
+    animation: none;
+  }
+}
+
 /* ---------- Teaser caption (flashes during spin) ---------- */
 .spin-teaser {
   font-family: var(--font-stamp), monospace;
