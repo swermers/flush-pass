@@ -6,6 +6,8 @@ const config: Config = {
     extend: {
       fontFamily: {
         marker: ['var(--font-marker)', 'cursive'],
+        stamp: ['var(--font-stamp)', 'Courier Prime', 'ui-monospace', 'monospace'],
+        display: ['var(--font-display)', 'Oswald', 'Impact', 'sans-serif'],
       },
       animation: {
         'pulse-soft': 'pulseSoft 2.5s ease-in-out infinite',
