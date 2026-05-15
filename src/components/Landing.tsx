@@ -31,15 +31,15 @@ export default function Landing() {
           icon={<RollIcon />}
         />
         <PassTile
+          href="/doors"
+          title="Pick a Door"
+          subtitle="Three stalls. One verdict."
+          icon={<DoorIcon />}
+        />
+        <PassTile
           title="Dice Roll"
           subtitle="Six faces. One is mercy."
           icon={<DiceIcon />}
-          disabled
-        />
-        <PassTile
-          title="Slot Machine"
-          subtitle="Three rolls in a row. Or no."
-          icon={<SlotIcon />}
           disabled
         />
       </div>
@@ -97,7 +97,7 @@ function DiceIcon() {
   );
 }
 
-function SlotIcon() {
+function DoorIcon() {
   return (
     <svg
       viewBox="0 0 24 24"
@@ -107,11 +107,12 @@ function SlotIcon() {
       className="h-8 w-8"
       aria-hidden
     >
-      <rect x="3" y="6" width="14" height="12" rx="1.5" />
-      <line x1="7.7" y1="6" x2="7.7" y2="18" />
-      <line x1="12.3" y1="6" x2="12.3" y2="18" />
-      <path d="M17 9h2v6h-2" />
-      <circle cx="20.5" cy="12" r="0.6" fill="currentColor" stroke="none" />
+      <rect x="3" y="3" width="5.5" height="18" rx="0.6" />
+      <rect x="9.25" y="3" width="5.5" height="18" rx="0.6" />
+      <rect x="15.5" y="3" width="5.5" height="18" rx="0.6" />
+      <circle cx="7.4" cy="12" r="0.55" fill="currentColor" stroke="none" />
+      <circle cx="13.65" cy="12" r="0.55" fill="currentColor" stroke="none" />
+      <circle cx="19.9" cy="12" r="0.55" fill="currentColor" stroke="none" />
     </svg>
   );
 }
