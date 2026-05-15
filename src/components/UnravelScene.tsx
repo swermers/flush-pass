@@ -1,11 +1,19 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { usePassFrame } from './PassFrame';
+import { usePreloadImages } from '@/hooks/usePreloadImages';
 import { getRandomAnswer } from '@/lib/answers';
 import ResetButton from './ResetButton';
-import TPRoll from './TPRoll';
+
+const ROLL_IMAGE = '/images/tp-roll.png';
+const ROLL_PRELOAD = [ROLL_IMAGE] as const;
+const ROLL_SIZE = 260;
+// One full rotation per this many pixels of paper pulled. Tuned so the
+// roll appears to spin at a believable speed relative to the streamer.
+const PIXELS_PER_REV = 360;
 
 export type UnravelState =
   | 'idle'
@@ -26,9 +34,15 @@ export default function UnravelScene() {
   const [answer, setAnswer] = useState<string>('');
   const [showHint, setShowHint] = useState(false);
 
+  usePreloadImages(ROLL_PRELOAD);
+
   // Streamer offset in px (how far the paper has unrolled).
   const offsetRef = useRef(0);
   const [offset, setOffset] = useState(0);
+
+  // Rotation in degrees, derived from offset so the roll spin matches
+  // the paper pull (and shares its deceleration during 'stopping').
+  const [rotation, setRotation] = useState(0);
 
   // RAF state
   const rafRef = useRef<number | null>(null);
@@ -63,6 +77,7 @@ export default function UnravelScene() {
       speedRef.current += (target - speedRef.current) * Math.min(1, k * dt);
       offsetRef.current += speedRef.current * dt;
       setOffset(offsetRef.current);
+      setRotation((offsetRef.current / PIXELS_PER_REV) * 360);
       rafRef.current = requestAnimationFrame(tick);
       return;
     }
@@ -76,6 +91,7 @@ export default function UnravelScene() {
       speedRef.current = stopFromSpeedRef.current * (1 - eased);
       offsetRef.current += speedRef.current * dt;
       setOffset(offsetRef.current);
+      setRotation((offsetRef.current / PIXELS_PER_REV) * 360);
       if (t >= 1) {
         speedRef.current = 0;
         rafRef.current = null;
@@ -126,6 +142,7 @@ export default function UnravelScene() {
       offsetRef.current = 0;
       speedRef.current = 0;
       setOffset(0);
+      setRotation(0);
       setState('unraveling');
       stateRef.current = 'unraveling';
       startLoop();
@@ -150,6 +167,7 @@ export default function UnravelScene() {
     if (reducedMotion) {
       offsetRef.current = 0;
       setOffset(0);
+      setRotation(0);
       setAnswer('');
       setState('idle');
       return;
@@ -163,6 +181,7 @@ export default function UnravelScene() {
       const eased = 1 - Math.pow(1 - t, 3);
       offsetRef.current = startOffset * (1 - eased);
       setOffset(offsetRef.current);
+      setRotation((offsetRef.current / PIXELS_PER_REV) * 360);
       if (t < 1) {
         requestAnimationFrame(animateRetract);
       } else {
@@ -209,7 +228,25 @@ export default function UnravelScene() {
       >
         {/* Roll, fixed near the top */}
         <div className="relative z-20 mt-[6vh] flex flex-col items-center">
-          <TPRoll size={Math.min(260, Math.round(0.55 * 600))} />
+          <div
+            className="relative"
+            style={{
+              width: ROLL_SIZE,
+              height: ROLL_SIZE,
+              transform: `rotate(${rotation}deg)`,
+              willChange: 'transform',
+            }}
+            aria-hidden
+          >
+            <Image
+              src={ROLL_IMAGE}
+              alt=""
+              fill
+              priority
+              sizes={`${ROLL_SIZE}px`}
+              draggable={false}
+            />
+          </div>
           {state === 'idle' && showHint && (
             <motion.span
               initial={{ opacity: 0, y: -4 }}
@@ -228,9 +265,9 @@ export default function UnravelScene() {
         <div
           className="pointer-events-none absolute left-1/2 -translate-x-1/2 overflow-hidden"
           style={{
-            top: 'calc(6vh + 110px)', // just below the roll
+            top: `calc(6vh + ${ROLL_SIZE}px)`, // just below the roll
             width: 'min(86vw, 360px)',
-            height: 'calc(94vh - 110px)',
+            height: `calc(94vh - ${ROLL_SIZE}px)`,
           }}
         >
           <div
