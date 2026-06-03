@@ -154,6 +154,48 @@ body {
   cursor: default;
 }
 
+/* ---------- Spin count pills (1 / 2 / 3) ---------- */
+.spin-pill {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-marker), 'Permanent Marker', cursive;
+  font-size: 28px;
+  color: #1a140a;
+  background: radial-gradient(
+    circle at 30% 25%,
+    #fff4c4 0%,
+    #f3c84a 55%,
+    #b8841d 100%
+  );
+  border: 2px solid rgba(255, 240, 200, 0.55);
+  box-shadow:
+    0 6px 18px rgba(0, 0, 0, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -4px 8px rgba(120, 70, 10, 0.4);
+  cursor: pointer;
+  transition:
+    transform 120ms ease,
+    box-shadow 120ms ease,
+    filter 120ms ease;
+}
+.spin-pill:hover,
+.spin-pill:focus-visible {
+  transform: translateY(-1px) scale(1.04);
+  filter: brightness(1.08);
+  outline: none;
+  box-shadow:
+    0 10px 22px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -4px 8px rgba(120, 70, 10, 0.45);
+}
+.spin-pill:active {
+  transform: translateY(0) scale(0.98);
+}
+
 /* ---------- Primary spin button ---------- */
 .btn-primary {
   height: 60px;
