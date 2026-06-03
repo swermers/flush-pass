@@ -33,7 +33,8 @@ export function usePassFrame(): PassFrameApi {
 
 const OTHER_ROUTE: Record<string, string> = {
   '/oracle': '/unravel',
-  '/unravel': '/oracle',
+  '/unravel': '/doors',
+  '/doors': '/oracle',
 };
 
 export default function PassFrame({ children }: { children: ReactNode }) {

@@ -25,7 +25,7 @@ const HOTSPOTS: Hotspot[] = [
   { id: 'craps', label: 'Craps Table', rect: [16, 14, 16, 42], comingSoon: true },
   { id: 'flush', label: 'Flush Oracle', href: '/oracle', rect: [33, 6, 17, 50] },
   { id: 'tp', label: 'TP Oracle', href: '/unravel', rect: [55, 8, 19, 48] },
-  { id: 'pick', label: 'Pick A Door', rect: [78, 6, 20, 50], comingSoon: true },
+  { id: 'pick', label: 'Pick A Door', href: '/doors', rect: [78, 6, 20, 50] },
   { id: 'attendant', label: 'The Attendant', isAttendant: true, rect: [33, 22, 25, 55] },
 ];
 

@@ -10,7 +10,6 @@ const TP_VIDEO = '/videos/tp-spin.mp4';
 const TP_POSTER = '/images/tp-spin-final.png';
 
 type UnravelState = 'idle' | 'spinning' | 'revealing' | 'answered';
-type SpinCount = 1 | 2 | 3;
 
 export default function UnravelScene() {
   const { audio, reducedMotion, startAmbient } = usePassFrame();
@@ -20,7 +19,6 @@ export default function UnravelScene() {
   const [showModal, setShowModal] = useState(false);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
-  const loopsRemainingRef = useRef(0);
   const includeWildRef = useRef(true);
 
   useEffect(() => {
@@ -41,48 +39,33 @@ export default function UnravelScene() {
   }, [audio]);
 
   const handleVideoEnded = useCallback(() => {
-    if (loopsRemainingRef.current > 1) {
-      loopsRemainingRef.current -= 1;
-      const v = videoRef.current;
-      if (v) {
-        v.currentTime = 0;
-        void v.play();
-      }
-      return;
-    }
-    loopsRemainingRef.current = 0;
     settleVerdict();
   }, [settleVerdict]);
 
-  const beginSpin = useCallback(
-    (n: SpinCount) => {
-      startAmbient();
-      audio.play('click', 0.6);
+  const beginSpin = useCallback(() => {
+    startAmbient();
+    audio.play('click', 0.6);
 
-      if (reducedMotion) {
-        settleVerdict();
-        return;
-      }
+    if (reducedMotion) {
+      settleVerdict();
+      return;
+    }
 
-      audio.playLoop('paperRustle', 0.35);
-      setAnswer(null);
-      setShowModal(false);
-      loopsRemainingRef.current = n;
-      setState('spinning');
+    audio.playLoop('paperRustle', 0.35);
+    setAnswer(null);
+    setShowModal(false);
+    setState('spinning');
 
-      const v = videoRef.current;
-      if (v) {
-        v.currentTime = 0;
-        void v.play();
-      }
-    },
-    [audio, reducedMotion, settleVerdict, startAmbient],
-  );
+    const v = videoRef.current;
+    if (v) {
+      v.currentTime = 0;
+      void v.play();
+    }
+  }, [audio, reducedMotion, settleVerdict, startAmbient]);
 
   const handleReset = useCallback(() => {
     audio.stop('paperRustle');
     audio.play('click', 0.5);
-    loopsRemainingRef.current = 0;
     setAnswer(null);
     setShowModal(false);
     setState('idle');
@@ -102,10 +85,9 @@ export default function UnravelScene() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'r' || e.key === 'R') handleReset();
-      if (state === 'idle') {
-        if (e.key === '1') beginSpin(1);
-        else if (e.key === '2') beginSpin(2);
-        else if (e.key === '3') beginSpin(3);
+      if (state === 'idle' && (e.code === 'Space' || e.key === 'Enter')) {
+        e.preventDefault();
+        beginSpin();
       }
     };
     window.addEventListener('keydown', onKey);
@@ -191,7 +173,7 @@ export default function UnravelScene() {
           </AnimatePresence>
         </div>
 
-        {/* Spin count picker (idle only) */}
+        {/* Spin button (idle only) */}
         <AnimatePresence>
           {state === 'idle' && (
             <motion.div
@@ -202,25 +184,15 @@ export default function UnravelScene() {
               transition={{ duration: 0.25 }}
               className="mt-7 flex flex-col items-center gap-3"
             >
-              <p className="font-marker text-sm tracking-[0.3em] text-white/80 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] sm:text-base">
-                HOW MANY SPINS?
-              </p>
-              <div className="flex items-center gap-3">
-                {[1, 2, 3].map((n) => (
-                  <button
-                    key={n}
-                    type="button"
-                    onClick={() => beginSpin(n as SpinCount)}
-                    className="spin-pill"
-                    aria-label={`${n} spin${n > 1 ? 's' : ''}`}
-                  >
-                    {n}
-                  </button>
-                ))}
-              </div>
-              <p className="text-[10px] tracking-[0.3em] text-white/45">
-                MORE SPINS · MORE TENSION
-              </p>
+              <button
+                type="button"
+                onClick={beginSpin}
+                className="btn-primary"
+                aria-label="Spin the toilet paper"
+              >
+                <span>SPIN</span>
+                <span className="kbd">SPACE</span>
+              </button>
             </motion.div>
           )}
         </AnimatePresence>
