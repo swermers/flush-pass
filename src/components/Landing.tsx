@@ -149,7 +149,7 @@ export default function Landing() {
       {/* Footer */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 z-40 flex justify-center px-6 pb-4">
         <p className="text-[10px] tracking-[0.3em] text-white/40 sm:text-xs">
-          free period · flush.freeperiod.xyz
+          freeperiod.ai
         </p>
       </div>
 
