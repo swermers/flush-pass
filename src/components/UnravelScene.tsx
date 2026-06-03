@@ -97,8 +97,56 @@ export default function UnravelScene() {
   const showTextOnSheet = state === 'revealing' || state === 'answered';
 
   return (
-    <div className="absolute inset-0 z-10 flex h-full w-full items-center justify-center">
-      {/* Top-right wildcard + reset chips */}
+    <div className="absolute inset-0 z-10 h-full w-full">
+      {/* Full-bleed background video */}
+      <video
+        ref={videoRef}
+        className="absolute inset-0 h-full w-full object-cover"
+        src={TP_VIDEO}
+        poster={TP_POSTER}
+        muted
+        playsInline
+        preload="auto"
+        onEnded={handleVideoEnded}
+        aria-hidden
+      />
+
+      {/* Verdict text overlay — positioned over the hanging sheet in
+          the video. Percentages are relative to the viewport; nudge if
+          the video composition changes. */}
+      <AnimatePresence>
+        {showTextOnSheet && answer && (
+          <motion.div
+            key="sheet-text"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.55, ease: 'easeOut' }}
+            className="pointer-events-none absolute"
+            style={{
+              left: '34%',
+              right: '34%',
+              top: '42%',
+              bottom: '20%',
+            }}
+          >
+            <div
+              className="flex h-full w-full items-center justify-center text-center font-marker"
+              style={{
+                color: 'rgba(28, 22, 14, 0.92)',
+                fontSize: 'clamp(0.9rem, 2vw, 1.4rem)',
+                lineHeight: 1.15,
+                transform: 'rotate(-1.5deg)',
+                textShadow: '0 1px 0 rgba(255,245,210,0.6)',
+              }}
+            >
+              {answer.text}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Top-right chips */}
       <div className="pointer-events-auto absolute right-3 top-14 z-40 flex flex-wrap items-center justify-end gap-2">
         <button
           type="button"
@@ -118,92 +166,29 @@ export default function UnravelScene() {
         </button>
       </div>
 
-      {/* TP video stage. Square aspect, centered, with text overlay on
-          the hanging sheet area when the spin resolves. */}
-      <div className="relative flex w-full max-w-[min(86vw,560px)] flex-col items-center px-6">
-        <div
-          className="relative w-full overflow-hidden rounded-lg shadow-[0_18px_60px_rgba(0,0,0,0.65)]"
-          style={{ aspectRatio: '1 / 1' }}
-        >
-          <video
-            ref={videoRef}
-            className="h-full w-full object-cover"
-            src={TP_VIDEO}
-            poster={TP_POSTER}
-            muted
-            playsInline
-            preload="auto"
-            onEnded={handleVideoEnded}
-            aria-hidden
-          />
-
-          {/* Verdict text painted over the hanging sheet. Position is
-              tuned to where the blank sheet sits in the final video
-              frame — nudge in CSS if the video changes. */}
-          <AnimatePresence>
-            {showTextOnSheet && answer && (
-              <motion.div
-                key="sheet-text"
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.55, ease: 'easeOut' }}
-                className="pointer-events-none absolute"
-                style={{
-                  left: '28%',
-                  right: '28%',
-                  top: '40%',
-                  bottom: '18%',
-                }}
-              >
-                <div
-                  className="flex h-full w-full items-center justify-center text-center font-marker"
-                  style={{
-                    color: 'rgba(28, 22, 14, 0.92)',
-                    fontSize: 'clamp(0.85rem, 2.4vw, 1.35rem)',
-                    lineHeight: 1.15,
-                    transform: 'rotate(-1.5deg)',
-                    textShadow: '0 1px 0 rgba(255,245,210,0.6)',
-                  }}
-                >
-                  {answer.text}
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-
-        {/* Spin button (idle only) */}
-        <AnimatePresence>
-          {state === 'idle' && (
-            <motion.div
-              key="picker"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 8 }}
-              transition={{ duration: 0.25 }}
-              className="mt-7 flex flex-col items-center gap-3"
+      {/* Spin button (idle only) */}
+      <AnimatePresence>
+        {state === 'idle' && (
+          <motion.div
+            key="spin-btn"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 8 }}
+            transition={{ duration: 0.25 }}
+            className="pointer-events-auto absolute bottom-10 left-1/2 z-40 -translate-x-1/2"
+          >
+            <button
+              type="button"
+              onClick={beginSpin}
+              className="btn-primary"
+              aria-label="Spin the toilet paper"
             >
-              <button
-                type="button"
-                onClick={beginSpin}
-                className="btn-primary"
-                aria-label="Spin the toilet paper"
-              >
-                <span>SPIN</span>
-                <span className="kbd">SPACE</span>
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Spinning status */}
-        {state === 'spinning' && (
-          <p className="mt-7 font-marker text-sm tracking-[0.3em] text-white/75 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)] sm:text-base">
-            UNRAVELLING…
-          </p>
+              <span>SPIN</span>
+              <span className="kbd">SPACE</span>
+            </button>
+          </motion.div>
         )}
-      </div>
+      </AnimatePresence>
 
       {/* Pop-up sheet modal */}
       <AnimatePresence>
