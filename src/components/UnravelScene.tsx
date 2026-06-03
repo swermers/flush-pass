@@ -6,7 +6,7 @@ import { usePassFrame } from './PassFrame';
 import { getRandomAnswer, type Answer } from '@/lib/answers';
 import ResetButton from './ResetButton';
 
-const TP_VIDEO = '/videos/tp-spin.mp4';
+const TP_VIDEO = '/videos/tp-spin-2.mp4';
 const TP_POSTER = '/images/tp-spin-final.png';
 
 type UnravelState = 'idle' | 'spinning' | 'revealing' | 'answered';
